@@ -4,6 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
+import { ScrollView } from 'react-native-virtualized-view';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
 type ScreenANavigationProp = StackNavigationProp<RootStackParamList, 'ProductDetail'>;
 type Props = {
@@ -55,6 +57,7 @@ const handleAddToCart = async () => {
                 console.log('====================================');
                 console.log(cartItemID);
                 console.log('====================================');
+                setQuantity(1)
                 Alert.alert('Thành công', `Đã cập nhật số lượng ${data.name} trong giỏ hàng`);
             } else {
                 // Nếu sản phẩm chưa có trong giỏ hàng, tạo mới cartItem
@@ -98,38 +101,47 @@ const handleAddToCart = async () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <Image source={{ uri: data.image }} style={styles.image} resizeMode="cover" />
-            <View style={styles.detailsContainer}>
-                <Text style={styles.productName}>{data.name}</Text>
-                <Text style={styles.productPrice}>Giá: {data.price} VND</Text>
-                <Text style={styles.productDiscount}>Giảm giá: {data.discount} VND</Text>
-                <Text style={styles.productEvaluate}>Đánh giá: {data.evaluate} sao</Text>
-                <Text style={styles.productSellDay}>Ngày bán: {data.sellDay}</Text>
-                <View style={styles.quantityContainer}>
-                    <Text>Số lượng:</Text>
-                    <View style={styles.quantityControl}>
-                        <TouchableOpacity style={styles.quantityButton} onPress={decrementQuantity}>
-                            <Text style={styles.quantityButtonText}>-</Text>
-                        </TouchableOpacity>
-                        <TextInput
-                            style={styles.quantityInput}
-                            keyboardType="numeric"
-                            value={String(quantity)}
-                            onChangeText={(text) => setQuantity(Number(text))}
-                        />
-                        <TouchableOpacity style={styles.quantityButton} onPress={incrementQuantity}>
-                            <Text style={styles.quantityButtonText}>+</Text>
-                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <FontAwesomeIcon name="chevron-left" size={24} color="#333" />
+            </TouchableOpacity>
+            <ScrollView style={styles.scrollView}>
+                <Image source={{ uri: data.image }} style={styles.image} resizeMode="stretch" />
+                <View style={styles.detailsContainer}>
+                    <Text style={styles.productName}>{data.name}</Text>
+                    <Text style={styles.productName}>{data.title}</Text>
+                    
+                    <Text style={styles.productPrice}>Giá: {data.price} VND</Text>
+                    <Text style={styles.productDiscount}>Giảm giá: {data.discount} VND</Text>
+                    <Text style={styles.productEvaluate}>Đánh giá: {data.evaluate} sao</Text>
+                    <Text style={styles.productSellDay}>Ngày bán: {data.sellDay}</Text>
+                    <View style={styles.quantityContainer}>
+                        <Text>Số lượng:</Text>
+                        <View style={styles.quantityControl}>
+                            <TouchableOpacity style={styles.quantityButton} onPress={decrementQuantity}>
+                                <Text style={styles.quantityButtonText}>-</Text>
+                            </TouchableOpacity>
+                            <TextInput
+                                style={styles.quantityInput}
+                                keyboardType="numeric"
+                                value={String(quantity)}
+                                onChangeText={(text) => setQuantity(Number(text))}
+                            />
+                            <TouchableOpacity style={styles.quantityButton} onPress={incrementQuantity}>
+                                <Text style={styles.quantityButtonText}>+</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
+                    <TouchableOpacity style={styles.addButton} onPress={handleAddToCart}>
+                        <Text style={styles.addButtonText}>Thêm vào giỏ hàng</Text>
+                    </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.addButton} onPress={handleAddToCart}>
-                    <Text style={styles.addButtonText}>Thêm vào giỏ hàng</Text>
-                </TouchableOpacity>
-            </View>
-            <View style={styles.commentSection}>
-                <Text style={styles.commentTitle}>Bình luận</Text>
-                {/* Hiển thị bình luận ở đây */}
-            </View>
+                <View style={styles.commentSection}>
+                    <Text style={styles.commentTitle}>Bình luận</Text>
+                    {/* Hiển thị bình luận ở đây */}
+                </View>
+                <View style={{ height: 100 }} />
+
+            </ScrollView>
         </SafeAreaView>
     );
 };
@@ -139,10 +151,19 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F5F5F5',
     },
+    scrollView: {
+        flexGrow: 1,
+    },
     image: {
         width: '100%',
         height: Dimensions.get('window').height / 2.5,
         marginBottom: 20,
+    },
+    backButton: {
+        position: 'absolute',
+        top: 20,
+        left: 10,
+        zIndex: 1,
     },
     detailsContainer: {
         paddingHorizontal: 15,
@@ -227,6 +248,17 @@ const styles = StyleSheet.create({
     },
     addButtonText: {
         color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    goBackButton: {
+        backgroundColor: '#CCCCCC',
+        paddingVertical: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    goBackButtonText: {
+        color: '#333333',
         fontSize: 16,
         fontWeight: 'bold',
     },

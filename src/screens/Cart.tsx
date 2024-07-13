@@ -6,6 +6,7 @@ import { colors } from '../constaints/colors';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import CheckBox from '@react-native-community/checkbox';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
 type ScreenANavigationProp = StackNavigationProp<RootStackParamList, 'Cart'>;
 type Props = {
@@ -203,11 +204,13 @@ const Cart: React.FC<Props> = ({ navigation, route }) => {
     }
     return (
         <View style={styles.container}>
+                        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <FontAwesomeIcon name="chevron-left" size={24} color="#333" />
+            </TouchableOpacity>
             <Text style={styles.title}>Giỏ Hàng Của Bạn</Text>
             {cartItems.length === 0 ? (
             <Text style={styles.emptyCartText}>Giỏ hàng của bạn đang trống!</Text>
-        ) : 
-           ( <>
+            ) : ( <>
                <FlatList
                     data={cartItems}
                     keyExtractor={item => item.cartItemID}
@@ -284,6 +287,12 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 20,
         color: '#333',
+    },
+    backButton: {
+        position: 'absolute',
+        top: 20,
+        left: 10,
+        zIndex: 1,
     },
     cartItem: {
         flexDirection: 'row',

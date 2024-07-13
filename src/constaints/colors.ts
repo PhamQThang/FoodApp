@@ -4,5 +4,6 @@ export const colors = {
     white: "#ffff",
     desc: "#e6e6e6",
     red: "#fe2020",
-    text: '#000'
+    text: '#000',
+    primary: 'red',
 }

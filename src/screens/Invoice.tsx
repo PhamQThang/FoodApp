@@ -4,6 +4,7 @@ import { Alert, FlatList, Image, SafeAreaView, StyleSheet, Text, TextInput, Touc
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
+import { ScrollView } from "react-native-virtualized-view";
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -112,27 +113,33 @@ const Invoice: React.FC<Props> = ({ navigation, route }) => {
             <Text style={styles.orderDate}>Ngày đặt hàng: {item.orderDate}</Text>
             <Text style={styles.totalAmount}>Tổng số tiền: {item.totalAmount}đ</Text>
             <Text style={styles.status}>Trạng thái: {item.status}</Text>
-            <FlatList
-                data={item.products}
-                keyExtractor={(product) => product.id}
-                renderItem={({ item }) => (
-                    <View style={styles.productItem}>
-                        <Image source={item.image} style={styles.productImage} />
-                        <View style={styles.productDetails}>
-                            <Text style={styles.productName}>{item.quantity}</Text>
-                            <Text style={styles.productName}>{item.name}</Text>
-                            <Text style={styles.productPrice}>{item.price}đ</Text>
+            <View >
+                <FlatList
+                    data={item.products}
+                    keyExtractor={(product) => product.id}
+                    renderItem={({ item }) => (
+                        <View style={styles.productItem}>
+                            <Image source={item.image} style={styles.productImage} />
+                            <View style={styles.productDetails}>
+                            <Text style={styles.productQuantity}>{item.quantity} x</Text>
+                                <Text style={styles.productName}>{item.name}</Text>
+                                <Text style={styles.productPrice}>{item.price}đ</Text>
+                            </View>
                         </View>
-                    </View>
-                )}
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-            />
+                    )}
+                    horizontal={false}
+                    showsHorizontalScrollIndicator={true}
+                />
+            </View>
         </TouchableOpacity>
     );
+    
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <FontAwesomeIcon name="chevron-left" size={24} color="#333" />
+            </TouchableOpacity>
             <View style={styles.statusContainer}>
                 <TouchableOpacity onPress={() => handleStatusChange('Đã Đặt')}>
                     <Text style={[styles.statusButton, orderStatus === 'Đã Đặt' && styles.activeStatus]}>Đã Đặt</Text>
@@ -149,7 +156,7 @@ const Invoice: React.FC<Props> = ({ navigation, route }) => {
                 renderItem={renderOrderItem}
                 keyExtractor={(item) => item.orderID}
             />
-        </View>
+        </ScrollView>
     );
 };
 
@@ -158,6 +165,12 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
         padding: 10,
+    },
+    backButton: {
+        position: 'absolute',
+        top: 20,
+        left: 10,
+        zIndex: 1,
     },
     statusContainer: {
         flexDirection: 'row',
@@ -209,6 +222,11 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 10,
         marginRight: 10,
+    },
+    productQuantity: {
+        fontSize: 16,
+        color: '#333',
+        paddingHorizontal: 6,
     },
     productDetails: {
         flex: 1,
