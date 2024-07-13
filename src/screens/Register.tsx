@@ -50,6 +50,13 @@ const Register: React.FC<Props> = ({ navigation }) => {
                 userIMG: ''
             });
 
+            // Tạo giỏ hàng cho người dùng mới
+            await firestore().collection('carts').doc(newUserID.toString()).set({
+                cartID: newUserID.toString(),
+                userID: newUserID.toString(),
+                date: new Date().toISOString(),
+            });
+
             Alert.alert('Thành công', 'Đăng ký thành công');
             navigation.navigate('Login', {data: 'default'});
         } catch (error) {

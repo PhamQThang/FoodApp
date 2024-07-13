@@ -50,7 +50,7 @@ const Home: React.FC<Props> = ({ navigation, route }) => {
     //loadUserName()
     loadFlashSale()
     handleNew()
-    console.log('==============LOGIN -> HOME=================');
+    console.log('==============HOME=================');
     console.log(data);
     console.log('====================================');
   }, [data])
@@ -108,16 +108,8 @@ const Home: React.FC<Props> = ({ navigation, route }) => {
               title: title
             });
           } catch (error) {
-            newData.push({
-              id: productID,
-              name: productName,
-              price: priceDiscount,
-              discount: discount,
-              image: 'imgURL error',
-              evaluate: evaluate,
-              sellDay: sellDay,
-              title: title
-            });
+            console.error('Error push data:', error);
+            throw new Error('Failed to push data');
           }
       }
   
@@ -189,33 +181,14 @@ const Home: React.FC<Props> = ({ navigation, route }) => {
 
     const goToCart = async () => {
       try {
-        const cartsSnapshot = await firestore().collection('carts').get();
         let cartID;
-
-        // Tìm cartID lớn nhất hiện có và tăng giá trị đó lên 1
-        let maxCartID = 0;
-        cartsSnapshot.forEach(doc => {
-            const currentCartID = parseInt(doc.data().cartID);
-            if (currentCartID > maxCartID) {
-                maxCartID = currentCartID;
-            }
-        });
-        const newCartID = (maxCartID + 1).toString();
-
         const userCartSnapshot = await firestore().collection('carts').where('userID', '==', data.userID).limit(1).get();
         if (userCartSnapshot.empty) {
-          // Nếu người dùng chưa có giỏ hàng, tạo giỏ hàng mới
-          await firestore().collection('carts').doc(newCartID).set({
-              cartID: newCartID, // Sử dụng ID tự tạo
-              userID: data.userID,
-              date: new Date().toISOString()
-          });
-          cartID = newCartID;
           console.log('====================================');
-          console.log('HOME chua co gio hang : ' + cartID);
+          console.log(data.userID);
           console.log('====================================');
-          //CHUYỂN SANG TRANG CART
-          navigation.navigate('Cart', { data : cartID });
+          // Nếu người dùng chưa có giỏ hàng, thông báo bị lỗi vì khi đăng ký đã tạo giỏ hàng
+          Alert.alert('Lỗi', 'Không thể vào giỏ hàng');
 
       } else {
           // Nếu người dùng đã có giỏ hàng, lấy cartID hiện có
@@ -224,7 +197,6 @@ const Home: React.FC<Props> = ({ navigation, route }) => {
           console.log('HOME da co gio hang : ' + cartID);
           console.log('====================================');
           navigation.navigate('Cart', { data : cartID });
-
       }
 
       } catch (error) {

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Alert, Image, Button } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Alert, Image, Button, TouchableOpacity } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../App';
 import { colors } from '../constaints/colors';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
+import CheckBox from '@react-native-community/checkbox';
 
 type ScreenANavigationProp = StackNavigationProp<RootStackParamList, 'Cart'>;
 type Props = {
@@ -37,6 +38,9 @@ const Cart: React.FC<Props> = ({ navigation, route }) => {
     const [totalPrice, setTotalPrice] = useState<number>(0);
 
     useEffect(() => {
+        console.log('====================================');
+        console.log(data);
+        console.log('====================================');
         loadCart();
     }, []);
     useEffect(() => {
@@ -49,15 +53,14 @@ const Cart: React.FC<Props> = ({ navigation, route }) => {
             const cartItemsSnapshot = await firestore()
                 .collection('cartItems')
                 .where('cartID', '==', data)
-                .get(); //thực hiện truy vấn và trả về một QuerySnapshot chứa các tài liệu (documents) thỏa mãn điều kiện.
-
+                .get(); //thực hiện truy vấn và trả về một QuerySnapshot chứa các tài liệu (documents) thỏa mãn điều kiện.          
             const loadedCartItems: CartItem[] = [];
 
             const cartItemsPromises = cartItemsSnapshot.docs.map(async doc => {
                 //Mỗi doc là một tài liệu (document) trong collection 'cartItems'.
 
                 const cartItem: CartItem = {
-                    cartItemID: doc.id,
+                    cartItemID: doc.data().cartItemID,
                     productID: doc.data().productID,
                     quantity: doc.data().quantity,
                 };
@@ -165,14 +168,31 @@ const Cart: React.FC<Props> = ({ navigation, route }) => {
         setTotalPrice(total);
     };
     const handlePlaceOrder = () => {
-        const selectedProducts = cartItems.filter(item => selectedItems[item.productID]);
+        if(totalPrice === 0) {
+            Alert.alert('Đặt Hàng', 'Vui lòng chọn món ăn trước khi đặt hàng!');
+        }
+        else {
+            const selectedProducts = cartItems
+            .filter(item => selectedItems[item.productID])
+            .map(item => {
+                const product = products[item.productID];
+                console.log('====================================');
+                console.log('cartitemid:       ' + item.cartItemID);
+                console.log('====================================');
+                return {
+                    cartItemID: item.cartItemID,
+                    productID: item.productID,
+                    productName: product.productName,
+                    image: product.image,
+                    quantity: item.quantity,
+                    price: product.price,
+                    discount: product.discount,
+                    totalPrice: (product.price - product.discount) * item.quantity,
+                };
+            });
 
-        // Chuyển sang trang hóa đơn và truyền dữ liệu
-         navigation.navigate('Bill', { data: selectedProducts, total: totalPrice});
-        Alert.alert('Đặt hàng thành công');
-        console.log('====================================');
-        console.log(selectedProducts);
-        console.log('====================================');
+            navigation.navigate('Bill', { data, selectedProducts, totalPrice });
+        }
     }
     if (loading) {
         return (
@@ -185,7 +205,7 @@ const Cart: React.FC<Props> = ({ navigation, route }) => {
         <View style={styles.container}>
             <Text style={styles.title}>Giỏ Hàng Của Bạn</Text>
             {cartItems.length === 0 ? (
-            <Text style={styles.title}>Giỏ hàng của bạn đang trống!</Text>
+            <Text style={styles.emptyCartText}>Giỏ hàng của bạn đang trống!</Text>
         ) : 
            ( <>
                <FlatList
@@ -197,38 +217,47 @@ const Cart: React.FC<Props> = ({ navigation, route }) => {
     
                         return (
                             <View style={styles.cartItem}>
-                                <Button 
-                                    title={selectedItems[item.productID] ? "Bỏ Chọn" : "Chọn"} 
-                                    onPress={() => handleSelectItem(item.productID)} 
-                                />
-                                
+                                <CheckBox
+                                    value={selectedItems[item.productID]}
+                                    onValueChange={() => handleSelectItem(item.productID)}
+                                    tintColors={{ true: '#F15927', false: 'black' }}
+                                    />
                                 <Image source={{ uri: product.image }} style={styles.itemImage} />
                                 <View style={styles.itemDetails}>
                                     <Text style={styles.itemName}>{product.productName}</Text>
-                                    <Text style={styles.itemQuantity}>Số Lượng: {item.quantity}</Text>
-                                    <Text style={styles.itemPrice}>Giá Gốc: ${product.price}</Text>
-                                    <Text style={styles.itemPrice}>Giảm Giá: ${product.discount}</Text>
-                                    <Text style={styles.itemPrice}>Thành Tiền: ${(product.price - product.discount) * item.quantity}</Text>
+                                    <View style={styles.itemContainer}>
+                                        <Text style={styles.itemDiscount}>đ{product.price - product.discount}</Text>
+                                        <Text style={styles.itemPrice}>{product.price}</Text>
+                                    </View>
+                                    <Text style={styles.itemTotal}>Thành Tiền: ${(product.price - product.discount) * item.quantity}</Text>
                                     <View style={styles.quantityControls}>
-                                        <Button title="-" onPress={() => decreaseQuantity(item.cartItemID, item.quantity)} />
-                                        <Text>{item.quantity}</Text>
-                                        <Button title="+" onPress={() => increaseQuantity(item.cartItemID, item.quantity)} />
+                                        <View style={styles.controlAccount}>
+                                        <TouchableOpacity onPress={() => decreaseQuantity(item.cartItemID, item.quantity)} style={styles.buttonControl}>
+                                            <Text style={styles.buttonText}>-</Text>
+                                        </TouchableOpacity>
+                                        <Text style={styles.quantity}>{item.quantity}</Text>
+                                        <TouchableOpacity onPress={() => increaseQuantity(item.cartItemID, item.quantity)} style={styles.buttonControl}>
+                                            <Text style={styles.buttonText}>+</Text>
+                                        </TouchableOpacity>
+                                        </View>
+                                        <TouchableOpacity onPress={() => handleRemoveItem(item.cartItemID)} style={styles.buttonRemove}>
+                                            <Text style={{ color: 'white', fontWeight: 'bold' }}>Xóa</Text>
+                                        </TouchableOpacity>
                                     </View>
                                 </View>
-                                <Button 
-                                            title="Xóa" 
-                                            onPress={() => handleRemoveItem(item.cartItemID)} 
-                                            color="red"
-                                        />
+
                             </View>
                             
                         );
                     }}
                 />
                 <View style={styles.footer}>
-                <Text style={styles.totalText}>Tổng Số Tiền: ${totalPrice}</Text>
-                <Button title="Đặt Hàng" onPress={handlePlaceOrder} />
-            </View>
+                    <Text style={styles.totalText}>Tổng Số Tiền: ${totalPrice}</Text>
+                    <TouchableOpacity style={styles.buttonPlaceOrder} onPress={handlePlaceOrder}>
+                        <Text style={{ color: 'white', fontWeight: 'bold' }}>Đặt Hàng</Text>
+                    </TouchableOpacity>
+                </View>
+
             </>
             )}
 
@@ -244,59 +273,136 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     title: {
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 10,
+        marginBottom: 20,
+        textAlign: 'center',
+        color: '#FF6347',
+    },
+    emptyCartText: {
+        fontSize: 18,
+        textAlign: 'center',
+        marginTop: 20,
+        color: '#333',
     },
     cartItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 15,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
+        justifyContent: 'center',
+        paddingHorizontal: 5,
+        paddingVertical: 10,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 10,
+        backgroundColor: '#f9f9f9',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        elevation: 3,
     },
     itemImage: {
-        width: 80,
-        height: 80,
+        width: 100,
+        height: 100,
+        borderRadius: 10,
         marginRight: 10,
+        resizeMode: 'stretch'
     },
     itemDetails: {
         flex: 1,
     },
     itemName: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
-    },
-    itemQuantity: {
-        fontSize: 14,
         color: '#333',
     },
+    itemQuantity: {
+        fontSize: 16,
+        color: '#333',
+    },
+    itemContainer:{
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     itemPrice: {
-        fontSize: 14,
+        fontSize: 12,
+        color: '#686868',
+        textDecorationLine: 'line-through',
+        marginLeft: 10
+    },
+    itemDiscount: {
+        fontSize: 20,
+        color: '#FF6347',
+        fontWeight: '800'
+    },
+    itemTotal: {
+        fontSize: 16,
+        fontWeight: 'bold',
         color: '#FF6347',
     },
     quantityControls: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
         marginTop: 10,
+        paddingRight: 20
+    },
+    controlAccount:{
+        flexDirection: 'row',
+        alignItems: 'center',
+
+    },
+    buttonControl: {
+        borderWidth: 1,
+        borderColor: 'black',
+        borderRadius: 5,
+        paddingHorizontal: 15,
+        paddingVertical: 4,
+    },
+    buttonText: {
+        fontSize: 18,
+        color: 'black',
+        fontWeight: 'bold',
+    },
+    quantity: {
+        paddingHorizontal: 15,
+        fontSize: 16,
+        color: '#333',
+    },
+    buttonRemove: {
+        backgroundColor: '#FF6347',
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        borderRadius: 5,
+        marginLeft: 10,
+    },
+    footer: {
+        flexDirection: 'row', // Đảm bảo các thành phần trong footer nằm ngang
+        justifyContent: 'space-between', // Các phần tử trong footer căn chỉnh cách đều nhau
+        borderTopWidth: 1,
+        borderTopColor: '#ddd',
+        marginTop: 20,
+        paddingTop: 10,
+        alignItems: 'center',
+        paddingHorizontal: 10, // Thêm padding nếu cần thiết
+    },
+    totalText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    buttonPlaceOrder: {
+        backgroundColor: 'red',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 5,
     },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
-},
-totalText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-},
 });
 
 export default Cart;

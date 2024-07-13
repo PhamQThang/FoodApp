@@ -13,12 +13,12 @@ const Stack = createNativeStackNavigator();
 export type RootStackParamList = {
   Login: { data?: any }; // ScreenA có thể nhận dữ liệu là một chuỗi tùy chọn
   Register: { data?: any }; // ScreenB có thể nhận dữ liệu là một chuỗi tùy chọn
-  Home: { data?: any }; // ScreenB có thể nhận dữ liệu là một chuỗi tùy chọn
+  Home: { data?: any, userID?:any }; // ScreenB có thể nhận dữ liệu là một chuỗi tùy chọn
   HomePage: { data?: any }; // ScreenB có thể nhận dữ liệu là một chuỗi tùy chọn
   Information : { data?: any };
-  Invoice : { data?: any };
+  Invoice : { userID?: any, orderID?: any};
   Cart: { data?: any };
-  Bill: { data?: any, total?: any };
+  Bill: { data?: any, selectedProducts?: any, totalPrice ?: any };
   ProductDetail: { data?: any, userID?: any };
 };
 const App: React.FC = () => {

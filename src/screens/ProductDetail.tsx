@@ -12,87 +12,72 @@ type Props = {
 };
 
 const ProductDetail: React.FC<Props> = ({ navigation, route }) => {
+    //lấy data từ trang Home, key là object newData push dữ liệu từ trang Home
     const { data, userID } = route.params;
     const [quantity, setQuantity] = useState(1);
-    const [cartID, setCartID] = useState('');
+    //const [cartID, setCartID] = useState('');
 
     useEffect(() => {
-      console.log('====================================');
-      console.log(data);
-      console.log('userID:', userID);
-      console.log('====================================');
+        console.log('====================================');
+        console.log('data: ' + data, 'usetID: ' + userID);
+        console.log('====================================');
   }, [data, userID]);
 
-
-
-  const handleAddToCart = async () => {
+const handleAddToCart = async () => {
     try {
         // Tìm cartID của người dùng
         let cartID;
         const userCartSnapshot = await firestore().collection('carts').where('userID', '==', userID).limit(1).get();
 
         if (userCartSnapshot.empty) {
-            // Nếu người dùng chưa có giỏ hàng, tạo giỏ hàng mới
-            const cartsSnapshot = await firestore().collection('carts').get();
-            let maxCartID = 0;
-            cartsSnapshot.forEach(doc => {
-                const currentCartID = parseInt(doc.data().cartID);
-                if (currentCartID > maxCartID) {
-                    maxCartID = currentCartID;
-                }
-            });
+            // Nếu người dùng chưa có giỏ hàng, thông báo lỗi vì khi đăng ký đã tạo giỏ hàng luôn
+            Alert.alert('Lỗi', `Tài Khoản bị lỗi thông tin giỏ hàng`);
 
-            cartID = (maxCartID + 1).toString();
-
-            await firestore().collection('carts').doc(cartID).set({
-                cartID: cartID,
-                userID: userID,
-                date: new Date().toISOString(),
-            });
         } else {
             // Nếu người dùng đã có giỏ hàng, lấy cartID hiện có
             cartID = userCartSnapshot.docs[0].data().cartID;
-        }
-
-        // Kiểm tra xem sản phẩm đã có trong giỏ hàng hay chưa
-        const cartItemsSnapshot = await firestore()
+            // Kiểm tra xem sản phẩm đã có trong giỏ hàng hay chưa
+            const cartItemsSnapshot = await firestore()
             .collection('cartItems')
             .where('cartID', '==', cartID)
             .where('productID', '==', data.id)
             .get();
 
-        if (!cartItemsSnapshot.empty) {
+            if (!cartItemsSnapshot.empty) {
             // Nếu sản phẩm đã có trong giỏ hàng, cập nhật số lượng
-            const cartItemID = cartItemsSnapshot.docs[0].id;
-            const currentQuantity = cartItemsSnapshot.docs[0].data().quantity;
-            const newQuantity = currentQuantity + quantity;
+                const cartItemID = cartItemsSnapshot.docs[0].data().cartItemID;
+                const currentQuantity = cartItemsSnapshot.docs[0].data().quantity;
+                const newQuantity = currentQuantity + quantity;
 
-            await firestore().collection('cartItems').doc(cartItemID).update({
-                quantity: newQuantity,
-            });
+                await firestore().collection('cartItems').doc(cartItemID).update({
+                    quantity: newQuantity,
+                });
+                console.log('====================================');
+                console.log(cartItemID);
+                console.log('====================================');
+                Alert.alert('Thành công', `Đã cập nhật số lượng ${data.name} trong giỏ hàng`);
+            } else {
+                // Nếu sản phẩm chưa có trong giỏ hàng, tạo mới cartItem
+                const cartItemsSnapshot = await firestore().collection('cartItems').get();
+                let maxCartItemID = 0;
+                cartItemsSnapshot.forEach(doc => {
+                    const cartItemID = parseInt(doc.data().cartItemID);
+                    if (cartItemID > maxCartItemID) {
+                        maxCartItemID = cartItemID;
+                    }
+                });
 
-            Alert.alert('Thành công', `Đã cập nhật số lượng ${data.name} trong giỏ hàng`);
-        } else {
-            // Nếu sản phẩm chưa có trong giỏ hàng, tạo mới cartItem
-            const cartItemsSnapshot = await firestore().collection('cartItems').get();
-            let maxCartItemID = 0;
-            cartItemsSnapshot.forEach(doc => {
-                const cartItemID = parseInt(doc.data().cartItemID);
-                if (cartItemID > maxCartItemID) {
-                    maxCartItemID = cartItemID;
-                }
-            });
+                const newCartItemID = (maxCartItemID + 1).toString();
 
-            const newCartItemID = (maxCartItemID + 1).toString();
+                await firestore().collection('cartItems').doc(newCartItemID).set({
+                    cartItemID: newCartItemID,
+                    cartID: cartID,
+                    productID: data.id,
+                    quantity: quantity,
+                });
 
-            await firestore().collection('cartItems').doc(newCartItemID).set({
-                cartItemID: newCartItemID,
-                cartID: cartID,
-                productID: data.id,
-                quantity: quantity,
-            });
-
-            Alert.alert('Thành công', `Đã thêm ${quantity} ${data.name} vào giỏ hàng`);
+                Alert.alert('Thành công', `Đã thêm ${quantity} ${data.name} vào giỏ hàng`);
+            }
         }
     } catch (error) {
         console.error('Error adding to cart: ', error);
