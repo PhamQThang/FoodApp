@@ -12,6 +12,7 @@ import HomeAdmin from "../admin/HomeAdmin";
 type ScreenANavigationProp = StackNavigationProp<RootStackParamList, 'ManageProduct'>;
 type Props = {
   navigation: ScreenANavigationProp;
+  route: any
 };
 type FlashSaleItem = {
   id: any;

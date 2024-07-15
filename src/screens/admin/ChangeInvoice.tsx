@@ -11,6 +11,7 @@ import FooterAdmin from "../../components/FooterAdmin";
 type ScreenANavigationProp = StackNavigationProp<RootStackParamList, 'ManageProduct'>;
 type Props = {
   navigation: ScreenANavigationProp;
+  route: any
 };
 type FlashSaleItem = {
   id: any;

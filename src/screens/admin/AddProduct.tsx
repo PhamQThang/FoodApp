@@ -10,6 +10,8 @@ import { launchImageLibrary } from "react-native-image-picker";
 type ScreenANavigationProp = StackNavigationProp<RootStackParamList, 'AddProduct'>;
 type Props = {
     navigation: ScreenANavigationProp;
+  route: any
+
   };
 const AddProduct:React.FC<Props>=({route,navigation}) =>{
     const {data,user} = route.params;
