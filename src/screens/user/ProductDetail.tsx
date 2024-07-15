@@ -3,7 +3,7 @@ import React, { useEffect, useId, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firestore from '@react-native-firebase/firestore';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App';
+import { RootStackParamList } from '../../../App';
 import { ScrollView } from 'react-native-virtualized-view';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 

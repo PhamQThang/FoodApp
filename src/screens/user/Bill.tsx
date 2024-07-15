@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App';
+import { RootStackParamList } from '../../../App';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 type ScreenANavigationProp = StackNavigationProp<RootStackParamList, 'Bill'>;

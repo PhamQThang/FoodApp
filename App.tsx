@@ -1,14 +1,14 @@
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
-import Login from './src/screens/Login';
-import Register from './src/screens/Register';
-import Home from './src/screens/Home';
-import Information from './src/screens/Information';
-import Invoice from './src/screens/Invoice';
-import Cart from './src/screens/Cart';
-import ProductDetail from './src/screens/ProductDetail';
-import Bill from './src/screens/Bill';
+import Login from './src/screens/login/Login';
+import Register from './src/screens/login/Register';
+import Home from './src/screens/user/Home';
+import Information from './src/screens/user/Information';
+import Invoice from './src/screens/user/Invoice';
+import Cart from './src/screens/user/Cart';
+import ProductDetail from './src/screens/user/ProductDetail';
+import Bill from './src/screens/user/Bill';
 const Stack = createNativeStackNavigator();
 export type RootStackParamList = {
   Login: { data?: any }; // ScreenA có thể nhận dữ liệu là một chuỗi tùy chọn

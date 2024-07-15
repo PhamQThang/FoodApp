@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, SafeAreaView, StyleSheet, StatusBar, TextInput, TouchableOpacity, Image, Dimensions, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Fontisto';
 import CheckBox from '@react-native-community/checkbox';
-import { colors } from '../constaints/colors';
+import { colors } from '../../constaints/colors';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App';
+import { RootStackParamList } from '../../../App';
 import firestore from '@react-native-firebase/firestore';
+import Iconeye from 'react-native-vector-icons/Ionicons';
 
 type ScreenANavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 type Props = {
@@ -16,6 +17,8 @@ const Login: React.FC<Props> = ({ navigation }) => {
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [iconName, setIconName] = useState('eye-outline');
+  const [hidePass, setHidePass] = useState(true);
 
   const handleEmail = (newText: string) => {
     setEmail(newText);
@@ -24,6 +27,12 @@ const Login: React.FC<Props> = ({ navigation }) => {
   const handlePassword = (newText: string) => {
     setPassword(newText);
   };
+
+  const ischeckicon=()=>{
+    const newicon = iconName === 'eye-outline' ? 'eye-off-outline' : 'eye-outline';
+    setHidePass(!hidePass);
+    setIconName(newicon);
+}
 
   const handleLogin = async () => {
     try {
@@ -53,7 +62,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={colors.bgColor} barStyle={'dark-content'} />
-      <Image source={require('../assets/images/footer.png')} style={styles.logo} />
+      <Image source={require('../../../src/assets/images/footer.png')} style={styles.logo} />
 
       <View style={styles.title}>
         <Text style={{ fontWeight: 'bold', fontSize: 30, color: 'black' }}>Đăng Nhập</Text>
@@ -70,11 +79,11 @@ const Login: React.FC<Props> = ({ navigation }) => {
           <TextInput
             value={password}
             onChangeText={handlePassword}
-            secureTextEntry={true}
+            secureTextEntry={hidePass}
             placeholder="Nhập Mật Khẩu"
             style={styles.input}
           />
-          <Icon name="eye" style={styles.iconEye} />
+          <Iconeye name={iconName} style={styles.iconEye} onPress={ischeckicon} />
         </View>
 
         <View style={styles.group1}>
@@ -108,7 +117,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
         </View>
       </View>
 
-      <Image resizeMode="stretch" style={styles.img} source={require('../assets/images/images.png')} />
+      <Image resizeMode="stretch" style={styles.img} source={require('../../../src/assets/images/images.png')} />
     </SafeAreaView>
   );
 };

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Alert, Image, Button, TouchableOpacity } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App';
-import { colors } from '../constaints/colors';
+import { RootStackParamList } from '../../../App';
+import { colors } from '../../constaints/colors';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import CheckBox from '@react-native-community/checkbox';

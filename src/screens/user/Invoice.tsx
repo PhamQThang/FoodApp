@@ -138,7 +138,7 @@ const Invoice: React.FC<Props> = ({ navigation, route }) => {
     return (
         <ScrollView style={styles.container}>
             <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                <FontAwesomeIcon name="chevron-left" size={24} color="#333" />
+                <FontAwesomeIcon name="chevron-left" size={24} color="#FF0000" />
             </TouchableOpacity>
             <View style={styles.statusContainer}>
                 <TouchableOpacity onPress={() => handleStatusChange('Đã Đặt')}>
@@ -168,8 +168,8 @@ const styles = StyleSheet.create({
     },
     backButton: {
         position: 'absolute',
-        top: 20,
-        left: 10,
+        top: 10,
+        left: 0,
         zIndex: 1,
     },
     statusContainer: {

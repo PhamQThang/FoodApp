@@ -6,7 +6,7 @@ import { NavigationProp } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Dimensions, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { launchImageLibrary } from "react-native-image-picker";
-import Footer from "../components/Footer";
+import Footer from "../../components/Footer";
 
 interface Props {
     navigation: NavigationProp<any>;
@@ -40,7 +40,7 @@ const Information: React.FC<Props> = ({ navigation, route }) => {
             behavior="padding"
             keyboardVerticalOffset={80}>
             <View style={styles.content}>
-                <Image source={require('../assets/images/footer.png')} style={styles.image} />
+                <Image source={require('../../../src/assets/images/footer.png')} style={styles.image} />
                 <View style={styles.container}>
                     <TouchableOpacity onPress={selectImage}>
                         {avatar ? (

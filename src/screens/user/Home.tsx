@@ -4,13 +4,13 @@ import { ScrollView } from 'react-native-virtualized-view'
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/Fontisto';
-import { RootStackParamList } from '../../App';
+import { RootStackParamList } from '../../../App';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import { colors } from '../constaints/colors';
+import { colors } from '../../constaints/colors';
 import firestore, {doc} from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
-import Footer from '../components/Footer';
+import Footer from '../../components/Footer';
 type ScreenANavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 type Props = {
     navigation: ScreenANavigationProp;
@@ -228,14 +228,14 @@ type Props = {
         </View>
   
           <ScrollView >
-            <Image source={require('../assets/images/footer.png')} style={styles.image}/>
+            <Image source={require('../../../src/assets/images/footer.png')} style={styles.image}/>
               {/* flashSale */}
               <View style={styles.saleContainer}>
                 <View style={styles.saleHeader}>
                   <Text style={styles.saleTitle}>Flash Sale</Text>
-                  <TouchableOpacity style={styles.saleButton}>
+                  {/* <TouchableOpacity style={styles.saleButton}>
                     <Text style={styles.saleButtonText}>Xem Thêm</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </View>
                   <FlatList
                     data={flashSaleItems}
@@ -345,6 +345,7 @@ const styles = StyleSheet.create({
   saleTitle: {
     fontSize: 22,
     fontWeight: 'bold',
+    color: 'red'
   },
   saleButton: {
     padding: 4,

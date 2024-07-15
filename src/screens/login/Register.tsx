@@ -3,8 +3,8 @@ import { View, Text, SafeAreaView, StyleSheet, StatusBar, TextInput, TouchableOp
 import Icon from 'react-native-vector-icons/Fontisto';
 import { StackNavigationProp } from '@react-navigation/stack';
 import firestore from '@react-native-firebase/firestore';
-import { RootStackParamList } from '../../App';
-import { colors } from '../constaints/colors';
+import { RootStackParamList } from '../../../App';
+import { colors } from '../../constaints/colors';
 
 type ScreenANavigationProp = StackNavigationProp<RootStackParamList, 'Register'>;
 type Props = {
@@ -72,7 +72,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar backgroundColor={colors.bgColor} barStyle={'dark-content'} />
-            <Image source={require('../assets/images/footer.png')} style={styles.logo}/>
+            <Image source={require('../../../src/assets/images/footer.png')} style={styles.logo}/>
             <View style={styles.title}>
                 <Text style={{ fontWeight: 'bold', fontSize: 30, color: 'black' }}>Đăng Ký</Text>
             </View>
@@ -111,7 +111,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
             </View>
 
             <View>
-                <Image resizeMode="stretch" style={styles.img} source={require('../assets/images/images.png')} />
+                <Image resizeMode="stretch" style={styles.img} source={require('../../../src/assets/images/images.png')} />
             </View>
         </SafeAreaView>
     );
