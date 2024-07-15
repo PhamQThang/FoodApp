@@ -9,6 +9,11 @@ import Invoice from './src/screens/user/Invoice';
 import Cart from './src/screens/user/Cart';
 import ProductDetail from './src/screens/user/ProductDetail';
 import Bill from './src/screens/user/Bill';
+import ManageProduct from './src/screens/admin/ManageProduct';
+import AddProduct from './src/screens/admin/AddProduct';
+import ChangeInvoice from './src/screens/admin/ChangeInvoice';
+import HomeAdmin from './src/screens/admin/HomeAdmin';
+
 const Stack = createNativeStackNavigator();
 export type RootStackParamList = {
   Login: { data?: any }; // ScreenA có thể nhận dữ liệu là một chuỗi tùy chọn
@@ -20,6 +25,10 @@ export type RootStackParamList = {
   Cart: { data?: any };
   Bill: { data?: any, selectedProducts?: any, totalPrice ?: any };
   ProductDetail: { data?: any, userID?: any };
+  HomeAdmin:{data?:string};
+  ChangeInvoice:{data?:string};
+  AddProduct:{data?:any,user?:any};
+  ManageProduct:{data?:string};
 };
 const App: React.FC = () => {
   return (
@@ -33,6 +42,10 @@ const App: React.FC = () => {
       <Stack.Screen name="Cart" component={Cart} />
       <Stack.Screen name="ProductDetail" component={ProductDetail} />
       <Stack.Screen name="Bill" component={Bill} />
+      <Stack.Screen name="ManageProduct" component={ManageProduct} />
+      <Stack.Screen name="AddProduct" component={AddProduct}/>
+      <Stack.Screen name="ChangeInvoice" component={ChangeInvoice}/>
+      <Stack.Screen name="HomeAdmin" component={HomeAdmin}/>
     </Stack.Navigator>
   </NavigationContainer>
   )
