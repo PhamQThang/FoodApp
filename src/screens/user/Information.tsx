@@ -1,87 +1,88 @@
-import React, { useState } from "react";
-import Icon from 'react-native-vector-icons/Fontisto';
-import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import React, { useEffect, useState } from "react";
 import { NavigationProp } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Dimensions, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { launchImageLibrary } from "react-native-image-picker";
+import { Alert, Dimensions, Image, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Footer from "../../components/Footer";
+import firestore from '@react-native-firebase/firestore';
 
 interface Props {
     navigation: NavigationProp<any>;
-    route: any
+    route: any;
 }
 
 const Information: React.FC<Props> = ({ navigation, route }) => {
     const [username, setUsername] = useState('');
-    const [address, setAddress] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [avatar, setAvatar] = useState(null);
-    const {data} = route.params || { data: 'Default Value' };
+    const [address, setAddress] = useState('');
+    const { data } = route.params;
 
-    const selectImage = () => {
-        launchImageLibrary({}, (response) => {
-            if (response.assets && response.assets.length > 0) {
-                setAvatar(response.assets[0].uri);
-            }
+    const handleSaveUser = async () => {
+        await firestore().collection('users').doc(data.userID).update({
+            name: username,
+            phone: phoneNumber,
+            address: address,
         });
+
+        Alert.alert("Cập nhật thông tin thành công");
+        loadUserData();
     };
 
-    const handleSave = () => {
-        // Handle save logic here
-        console.log({ username, address, phoneNumber, avatar });
+    const loadUserData = async () => {
+        const userDoc = await firestore().collection('users').doc(data.userID).get();
+        const userData = userDoc.data();
+        if (userData) {
+            setUsername(userData.name || '');
+            setPhoneNumber(userData.phone || '');
+            setAddress(userData.address || '');
+        }
     };
+
+    useEffect(() => {
+        if (data !== 'default') {
+            loadUserData();
+        }
+    }, [data]);
 
     return (
         <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView
-            style={styles.container}
-            behavior="padding"
-            keyboardVerticalOffset={80}>
-            <View style={styles.content}>
-                <Image source={require('../../../src/assets/images/footer.png')} style={styles.image} />
-                <View style={styles.container}>
-                    <TouchableOpacity onPress={selectImage}>
-                        {avatar ? (
-                            <Image source={{ uri: avatar }} style={styles.avatar} />
-                        ) : (
-                            <View style={styles.avatarPlaceholder}>
-                                <Text style={styles.avatarText}>Select Image</Text>
-                            </View>
-                        )}
-                    </TouchableOpacity>
-                    <View style={styles.inputFrame}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Username"
-                            value={username}
-                            onChangeText={setUsername}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Address"
-                            value={address}
-                            onChangeText={setAddress}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Phone Number"
-                            value={phoneNumber}
-                            onChangeText={setPhoneNumber}
-                            keyboardType="phone-pad"
-                        />
-                        <TouchableOpacity style={styles.button} onPress={handleSave}>
-                            <Text style={styles.buttonText}>Save</Text>
-                        </TouchableOpacity>
+                style={styles.container}
+                behavior="padding"
+                keyboardVerticalOffset={80}>
+                <View style={styles.content}>
+                    <Image source={require('../../../src/assets/images/footer.png')} style={styles.image} />
+                    <View style={styles.container}>
+                        <View style={styles.inputFrame}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Username"
+                                value={username}
+                                onChangeText={setUsername}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Address"
+                                value={address}
+                                onChangeText={setAddress}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Phone Number"
+                                value={phoneNumber}
+                                onChangeText={setPhoneNumber}
+                                keyboardType="phone-pad"
+                            />
+                            <TouchableOpacity style={styles.button} onPress={handleSaveUser}>
+                                <Text style={styles.buttonText}>Save</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={() => navigation.navigate('Login', { data: 'Default' })}>
+                                <Text style={styles.buttonText}>Đăng Xuất</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
-            </View>
-            {/* footer */}
-
             </KeyboardAvoidingView>
-            <Footer navigation={navigation} data={data}/>
-
+            <Footer navigation={navigation} data={data} />
         </SafeAreaView>
     );
 }
@@ -91,6 +92,7 @@ const windowWidth = Dimensions.get('window').width;
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
+        backgroundColor: '#f2f2f2',
     },
     content: {
         flex: 1,
@@ -98,54 +100,46 @@ const styles = StyleSheet.create({
     image: {
         width: windowWidth,
         height: 150,
-        backgroundColor: '#ccc',
     },
     container: {
         flex: 1,
-    },
-    avatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        alignSelf: 'center',
-    },
-    avatarPlaceholder: {
-        marginTop: 20,
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        alignSelf: 'center',
-        backgroundColor: '#cccccc',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    avatarText: {
-        color: '#ffffff',
+        paddingHorizontal: 20,
+        paddingTop: 20,
     },
     inputFrame: {
-        paddingHorizontal: 20,
-        marginTop: 20,
         borderRadius: 10,
+        backgroundColor: '#fff',
+        padding: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     input: {
-        height: 40,
+        height: 50,
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 5,
         marginBottom: 15,
         paddingHorizontal: 10,
+        fontSize: 16,
     },
     button: {
-        height: 40,
+        height: 50,
         backgroundColor: '#007BFF',
-        paddingVertical: 10,
-        paddingHorizontal: 15,
-        borderRadius: 5,
+        justifyContent: 'center',
         alignItems: 'center',
+        borderRadius: 5,
+        marginBottom: 15,
+    },
+    logoutButton: {
+        backgroundColor: '#FF6347',
     },
     buttonText: {
         color: '#fff',
-        fontSize: 16,
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });
 

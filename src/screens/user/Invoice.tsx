@@ -17,6 +17,7 @@ interface FoodItem {
     price: string;
     image: any;
 }
+
 const Invoice: React.FC<Props> = ({ navigation, route }) => {
     const { data } = route.params;
     const [orderStatus, setOrderStatus] = useState('Đã Đặt');
@@ -53,12 +54,8 @@ const Invoice: React.FC<Props> = ({ navigation, route }) => {
                         .where('productID', '==', detailData.productID)
                         .get();
     
-                        //lấy ra danh sách sản phẩm
                     if (!productSnapshot.empty) {
                         const productData = productSnapshot.docs[0].data();
-                        console.log('====================================');
-                        console.log(productData);
-                        console.log('====================================');
                         if (productData) {
                             const imageRef = storage()
                                 .ref()
@@ -81,7 +78,6 @@ const Invoice: React.FC<Props> = ({ navigation, route }) => {
                     }
                 }
     
-                //đây là thêm danh sách orderDetail
                 orders.push({
                     orderID: orderData.orderID,
                     orderDate: orderData.orderDate,
@@ -89,7 +85,6 @@ const Invoice: React.FC<Props> = ({ navigation, route }) => {
                     status: orderData.status,
                     products: products,
                 });
-
             }
     
             setOrderList(orders);
@@ -97,7 +92,6 @@ const Invoice: React.FC<Props> = ({ navigation, route }) => {
             console.error('Error fetching orders:', error);
         }
     };
-    
 
     useEffect(() => {
         fetchOrders();
@@ -108,12 +102,12 @@ const Invoice: React.FC<Props> = ({ navigation, route }) => {
     };
 
     const renderOrderItem = ({ item }: { item: any }) => (
-        <TouchableOpacity style={styles.orderItem} onPress={() => navigation.navigate('Invoice', { data: data})}>
+        <TouchableOpacity style={styles.orderItem} onPress={() => navigation.navigate('Invoice', { data: data })}>
             <Text style={styles.orderID}>Mã đơn hàng: {item.orderID}</Text>
             <Text style={styles.orderDate}>Ngày đặt hàng: {item.orderDate}</Text>
             <Text style={styles.totalAmount}>Tổng số tiền: {item.totalAmount}đ</Text>
             <Text style={styles.status}>Trạng thái: {item.status}</Text>
-            <View >
+            <View>
                 <FlatList
                     data={item.products}
                     keyExtractor={(product) => product.id}
@@ -121,7 +115,7 @@ const Invoice: React.FC<Props> = ({ navigation, route }) => {
                         <View style={styles.productItem}>
                             <Image source={item.image} style={styles.productImage} />
                             <View style={styles.productDetails}>
-                            <Text style={styles.productQuantity}>{item.quantity} x</Text>
+                                <Text style={styles.productQuantity}>{item.quantity} x</Text>
                                 <Text style={styles.productName}>{item.name}</Text>
                                 <Text style={styles.productPrice}>{item.price}đ</Text>
                             </View>
@@ -133,7 +127,6 @@ const Invoice: React.FC<Props> = ({ navigation, route }) => {
             </View>
         </TouchableOpacity>
     );
-    
 
     return (
         <ScrollView style={styles.container}>
@@ -143,9 +136,6 @@ const Invoice: React.FC<Props> = ({ navigation, route }) => {
             <View style={styles.statusContainer}>
                 <TouchableOpacity onPress={() => handleStatusChange('Đã Đặt')}>
                     <Text style={[styles.statusButton, orderStatus === 'Đã Đặt' && styles.activeStatus]}>Đã Đặt</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleStatusChange('Đã Hủy')}>
-                    <Text style={[styles.statusButton, orderStatus === 'Đã Hủy' && styles.activeStatus]}>Đã Hủy</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleStatusChange('Đã Giao')}>
                     <Text style={[styles.statusButton, orderStatus === 'Đã Giao' && styles.activeStatus]}>Đã Giao</Text>
@@ -193,51 +183,70 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 10,
         marginBottom: 10,
+        backgroundColor: '#f9f9f9',
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 2,
+        elevation: 2,
     },
     orderID: {
         fontSize: 16,
         fontWeight: 'bold',
         color: '#333',
+        marginBottom: 5,
     },
     orderDate: {
         fontSize: 14,
         color: '#666',
+        marginBottom: 5,
     },
     totalAmount: {
         fontSize: 14,
         color: '#666',
+        marginBottom: 5,
     },
     status: {
         fontSize: 14,
         color: '#666',
+        marginBottom: 10,
     },
     productItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 5,
-        justifyContent: 'space-between'
+        marginBottom: 10,
+        padding: 10,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 1 },
+        shadowRadius: 2,
+        elevation: 2,
     },
     productImage: {
-        width: 50,
-        height: 50,
+        width: 60,
+        height: 60,
         borderRadius: 10,
         marginRight: 10,
     },
-    productQuantity: {
-        fontSize: 16,
-        color: '#333',
-        paddingHorizontal: 6,
-    },
     productDetails: {
         flex: 1,
+        flexDirection: 'column',
+    },
+    productQuantity: {
+        fontSize: 14,
+        color: '#333',
+        marginBottom: 5,
     },
     productName: {
         fontSize: 14,
         fontWeight: 'bold',
         color: '#333',
+        marginBottom: 5,
     },
     productPrice: {
-        fontSize: 12,
+        fontSize: 14,
         color: '#FF6347',
     },
 });

@@ -12,7 +12,6 @@ import Bill from './src/screens/user/Bill';
 import ManageProduct from './src/screens/admin/ManageProduct';
 import AddProduct from './src/screens/admin/AddProduct';
 import ChangeInvoice from './src/screens/admin/ChangeInvoice';
-import HomeAdmin from './src/screens/admin/HomeAdmin';
 
 const Stack = createNativeStackNavigator();
 export type RootStackParamList = {
@@ -25,10 +24,10 @@ export type RootStackParamList = {
   Cart: { data?: any };
   Bill: { data?: any, selectedProducts?: any, totalPrice ?: any };
   ProductDetail: { data?: any, userID?: any };
-  HomeAdmin:{data?:string};
-  ChangeInvoice:{data?:string};
+  HomeAdmin:{data?:any};
+  ChangeInvoice:{data?:any};
   AddProduct:{data?:any,user?:any};
-  ManageProduct:{data?:string};
+  ManageProduct:{data?:any};
 };
 const App: React.FC = () => {
   return (
@@ -45,7 +44,6 @@ const App: React.FC = () => {
       <Stack.Screen name="ManageProduct" component={ManageProduct} />
       <Stack.Screen name="AddProduct" component={AddProduct}/>
       <Stack.Screen name="ChangeInvoice" component={ChangeInvoice}/>
-      <Stack.Screen name="HomeAdmin" component={HomeAdmin}/>
     </Stack.Navigator>
   </NavigationContainer>
   )

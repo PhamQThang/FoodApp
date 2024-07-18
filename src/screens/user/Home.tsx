@@ -117,7 +117,7 @@ type Props = {
             const newData = await fetchProducts();
             setFlashSaleItems(newData.sort((a, b) => b.discount - a.discount));
         } catch (error) {
-            Alert.alert('Error', 'Failed to fetch products');
+            Alert.alert('Error loadFlashSale', 'Failed to fetch products');
         }
     };
 
@@ -130,7 +130,7 @@ type Props = {
             const newData = await fetchProducts();
             setFoodItems(newData.sort((a, b) => parseDate(b.sellDay).getTime() - parseDate(a.sellDay).getTime()));
         } catch (error) {
-            Alert.alert('Error', 'Failed to fetch products');
+            Alert.alert('Error handleNew', 'Failed to fetch products');
         }
     };
 
@@ -143,7 +143,7 @@ type Props = {
             const newData = await fetchProducts();
             setFoodItems(newData.sort((a, b) => b.sellNumber - a.sellNumber));
         } catch (error) {
-            Alert.alert('Error', 'Failed to fetch products');
+            Alert.alert('Error handleSell', 'Failed to fetch products');
         }
     };
 
@@ -156,7 +156,7 @@ type Props = {
             const newData = await fetchProducts();
             setFoodItems(newData.sort((a, b) => b.evaluate - a.evaluate));
         } catch (error) {
-            Alert.alert('Error', 'Failed to fetch products');
+            Alert.alert('Error handleEvaluate', 'Failed to fetch products');
         }
     };
 
@@ -228,7 +228,7 @@ type Props = {
         </View>
   
           <ScrollView >
-            <Image source={require('../../../src/assets/images/footer.png')} style={styles.image}/>
+            <Image source={require('../../../src/assets/images/background.jpg')} style={styles.image}/>
               {/* flashSale */}
               <View style={styles.saleContainer}>
                 <View style={styles.saleHeader}>
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   filterItem: {
-    width: '33.333%',
+    width: '33.333%', 
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 10,

@@ -135,10 +135,9 @@ const handleAddToCart = async () => {
                         <Text style={styles.addButtonText}>Thêm vào giỏ hàng</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={styles.commentSection}>
-                    <Text style={styles.commentTitle}>Bình luận</Text>
-                    {/* Hiển thị bình luận ở đây */}
-                </View>
+                {/* <View style={styles.commentSection}>
+                    <Text style={styles.commentTitle}></Text>
+                </View> */}
                 <View style={{ height: 100 }} />
 
             </ScrollView>

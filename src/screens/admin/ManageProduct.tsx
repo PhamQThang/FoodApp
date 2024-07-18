@@ -7,34 +7,34 @@ import { RootStackParamList } from "../../../App";
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import FooterAdmin from '../../components/FooterAdmin';
-import HomeAdmin from "../admin/HomeAdmin";
 
 type ScreenANavigationProp = StackNavigationProp<RootStackParamList, 'ManageProduct'>;
 type Props = {
   navigation: ScreenANavigationProp;
-  route: any
+  route: any;
 };
 type FlashSaleItem = {
   id: any;
   name: any;
   price: string;
   image: any;
-  discount: any,
-  sellDay: any,
-  evaluate:any;
+  discount: any;
+  sellDay: any;
+  evaluate: any;
+  title: any
 };
+
 const ManageProduct: React.FC<Props> = ({ route, navigation }) => {
-  const [flashSaleItems, setFlashSaleItems] = useState<
-    { id: string; name: string; price: string; image: string; discount: string; evaluate: number; sellDay: string; title: string }[]
-  >([]);
+  const [flashSaleItems, setFlashSaleItems] = useState<FlashSaleItem[]>([]);
   const { data } = route.params;
   const [status, setStatus] = useState('ManageProduct');
-  const [load,setLoad] = useState('');
-  const [HomeAdmin,setHomeAdmin]= useState('<Home');
+  const [load, setLoad] = useState('');
+  const [HomeAdmin, setHomeAdmin] = useState('<Home');
+
   const fetchFlashSaleItems = async () => {
     try {
       const snapshot = await firestore().collection('products').get();
-      const newdata: { id: string; name: string; price: string; image: string; discount: string; evaluate: number; sellDay: string; title: string }[] = [];
+      const newdata: FlashSaleItem[] = [];
       for (const doc of snapshot.docs) {
         const productData = doc.data();
         const discount = productData.discount;
@@ -58,162 +58,126 @@ const ManageProduct: React.FC<Props> = ({ route, navigation }) => {
             sellDay: sellDay,
             title: title,
           });
-          
         } catch (error) {
           console.error('Error fetching image URL:', error);
           Alert.alert('Error', 'Failed to fetch product images');
         }
       }
-
       setFlashSaleItems(newdata);
-      
     } catch (error) {
       console.error('Error fetching products:', error);
       Alert.alert('Error', 'Failed to fetch products');
     }
   };
-  function handleItem(item:any) {
-    navigation.navigate('AddProduct',{data:item})
+
+  function handleItem(item: FlashSaleItem) {
+    navigation.navigate('AddProduct', { data: item });
   }
-  function deleteItem(item:any){
-    Alert.alert('Bạn muốn xoá ko', '', [
+
+  function deleteItem(item: FlashSaleItem) {
+    Alert.alert('Bạn muốn xoá không?', '', [
       {
         text: 'Không',
         style: 'cancel',
       },
-      {text: 'Có', onPress: async () => {
-        
-        await firestore().collection('products').doc(item.id).delete();
-        setLoad('1');
-      }},
-    ])
+      {
+        text: 'Có', onPress: async () => {
+          await firestore().collection('products').doc(item.id).delete();
+          setLoad('1');
+        }
+      },
+    ]);
   }
-  const renderFoodItem = ({ item }: { item: { id: string; name: string; price: string; image: string; discount: string; evaluate: number; sellDay: string; title: string } }) => (
-    <TouchableOpacity onPress={() => handleItem(item)} onLongPress={()=>deleteItem(item)}>
-        <View key={item.id} style={styles.foodItem}>
-      <Image source={{ uri: item.image }} style={styles.foodImage} />
-          <View>
-        <Text style={styles.foodName}>{item.name}</Text>
-        <Text style={styles.foodPrice}>{item.price}</Text>
-      </View>
+
+  const renderFoodItem = ({ item }: { item: FlashSaleItem }) => (
+    <TouchableOpacity onPress={() => handleItem(item)} onLongPress={() => deleteItem(item)}>
+      <View key={item.id} style={styles.foodItem}>
+        <Image source={{ uri: item.image }} style={styles.foodImage} />
+        <View style={styles.foodDetails}>
+          <Text style={styles.foodName}>{item.name}</Text>
+          <Text style={styles.foodPrice}>{item.price}</Text>
         </View>
+      </View>
     </TouchableOpacity>
-    
   );
+
   useEffect(() => {
-    setLoad('0')
+    setLoad('0');
     fetchFlashSaleItems();
-  }, [data,load]);
+  }, [data, load]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <TouchableOpacity onPress={()=>{navigation.navigate("HomeAdmin",{data:data})}}>
-            <Text style={styles.saleTitle}>{HomeAdmin}</Text>
-      </TouchableOpacity>
-      <View style={styles.listButton}>
-        <TouchableOpacity onPress={() => navigation.navigate('ManageProduct',{data:'default'})}>
-          <Text style={[styles.itemButton,  styles.activeButton]}>Sản phẩm</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('ChangeInvoice',{data:'default'})}>
-          <Text style={[styles.itemButton]}>Hoá đơn</Text>
+      <View style={styles.addButtonContainer}>
+        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('AddProduct', { data: 'default' })}>
+          <Text style={styles.addButtonText}>Thêm Sản Phẩm</Text>
         </TouchableOpacity>
       </View>
-      <View style={{display:'flex'}}>
-        <TouchableOpacity style={styles.background} onPress={() => navigation.navigate('AddProduct', { data: 'default' })}>
-          <Text style={[styles.itemThem]}>Thêm Sản Phẩm</Text>
-        </TouchableOpacity>
-        
-        <FlatList
-          data={flashSaleItems}
-          renderItem={renderFoodItem}
-          keyExtractor={item => item.id}
-          horizontal={false}
-          showsHorizontalScrollIndicator={false}
-        />
-      </View>
-      
+      <FlatList
+        data={flashSaleItems}
+        renderItem={renderFoodItem}
+        keyExtractor={item => item.id}
+        horizontal={false}
+        showsHorizontalScrollIndicator={false}
+      />
       <FooterAdmin navigation={navigation} data={data} />
-      
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  saleTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#007BFF',
+  safeArea: {
+    flex: 1,
+    backgroundColor: 'white',
+    paddingBottom: 60
+
   },
-  listButton: {
-    marginTop: 10,
-    flexDirection: 'row',
-    width: '100%',
+  addButtonContainer: {
     alignItems: 'center',
-    backgroundColor: '#fff',
-    justifyContent: 'space-evenly',
-    paddingBottom:10,
+    marginVertical: 10,
   },
-  itemButton: {
-    fontSize: 16,
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'transparent',
-  },
-  activeButton: {
-    color: 'red',
-    borderBottomColor: 'red',
-  },
-  background1: {
-    backgroundColor: '#fff',
-    paddingTop: 10,
-    
-  },
-  background: {
+  addButton: {
     backgroundColor: 'red',
-    height: 35,
+    height: 40,
     alignItems: 'center',
-    alignSelf: 'center',
-    width: 150,
-    borderCurve:'circular',
-    borderRadius: 17.5,
+    justifyContent: 'center',
+    width: 160,
+    borderRadius: 20,
   },
-  itemThem:{
-    fontSize:18,
+  addButtonText: {
+    fontSize: 18,
     color: 'white',
-    paddingTop:5,
   },
   foodItem: {
-    
-    backgroundColor: '#ACBDC3',
+    backgroundColor: '#f8f9fa',
     borderRadius: 10,
-    margin:10,
+    margin: 10,
     padding: 10,
-    marginBottom: 10,
-    borderWidth: 1, 
     flexDirection: 'row',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
   },
   foodImage: {
     width: 100,
     height: 100,
     borderRadius: 10,
   },
-  foodName: {
+  foodDetails: {
     marginLeft: 10,
+  },
+  foodName: {
     fontSize: 16,
     fontWeight: 'bold',
   },
   foodPrice: {
-    marginLeft: 10,
     fontSize: 14,
     color: 'red',
-  },
-  safeArea: {
-    flex: 1,
-    backgroundColor: 'white',
+    marginTop: 5,
   },
 });
 
 export default ManageProduct;
-
-

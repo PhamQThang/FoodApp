@@ -25,6 +25,15 @@ const AddProduct:React.FC<Props>=({route,navigation}) =>{
         const [tang,setTang] = useState('');
         const [IMGuri,setIMGuri]=useState("");
        
+        const parseDate = (dateString: any) => {
+            const [day, month, year] = dateString.split('/').map(Number);
+            return new Date(year, month - 1, day);
+        };
+    
+        const formatDate = (dateString: any) => {
+            const [day, month, year] = dateString.split('/');
+            return `${day}/${month}/${year}`;
+        };
             const handleSaveProduct = async () => {
                 tangid();
               try {
@@ -38,6 +47,8 @@ const AddProduct:React.FC<Props>=({route,navigation}) =>{
                         discount:discount,
                         evaluate:evaluate,
                         title:title,
+                        sellDay: new Date().toLocaleDateString('vi-VN'),
+                        sellNumber: "0"
                       });
                 }else{
                     
@@ -74,7 +85,7 @@ const AddProduct:React.FC<Props>=({route,navigation}) =>{
             }
         });
     };
-    const Uploading =async (uri)=>{
+    const Uploading =async (uri: string)=>{
 
         try {
             const imageName = tang+productname+'.jpg'; // Lấy tên ảnh từ biến NameIMG
@@ -121,8 +132,8 @@ const AddProduct:React.FC<Props>=({route,navigation}) =>{
     }
     return(
         <SafeAreaView style={styles.safeArea}>
-            <TouchableOpacity onPress={() => navigation.navigate('ManageProduct',{data:'default'})}>
-                <Text>Hoá Đơn</Text>
+            <TouchableOpacity style={styles.goBack} onPress={() => navigation.goBack()}>
+                <Text>Trở về</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={selectImage}>
                         {avatar ? (
@@ -196,6 +207,10 @@ const styles = StyleSheet.create({
     avatarText: {
         color: '#ffffff',
     },
+    goBack:{
+        padding: 10,
+        fontSize: 16,
+    },
     avatarPlaceholder: {
         marginTop: 20,
         width: 100,
@@ -231,9 +246,8 @@ const styles = StyleSheet.create({
     },
     button:{
         
-        width:350,
+        width:'100%',
         backgroundColor:'orange',
-        
         height:30,
     },
     buttonText:{

@@ -38,18 +38,42 @@ const Login: React.FC<Props> = ({ navigation }) => {
     try {
       const snapshot = await firestore().collection('users').get();
       let loggedInUser = null;
+      let isAdmin = false;
 
       for (const doc of snapshot.docs) {
         const emailFB = doc.data().email;
         const passFB = doc.data().password;
+        const role = doc.data().role; // Lấy thông tin về vai trò của người dùng
+
         if (emailFB.trim() === email.trim() && passFB.trim() === password.trim()) {
           loggedInUser = doc.data();
+          console.log('====================================');
+          console.log(loggedInUser.role);
+          console.log('====================================');
+          if (role === 'admin') { // Kiểm tra nếu người dùng là admin
+            isAdmin = true;
+          }
           break;
         }
+
+
       }
 
       if (loggedInUser) {
-        navigation.navigate('Home', { data: loggedInUser });
+          if (isAdmin) {
+              try{  
+                navigation.navigate("ManageProduct",{data: loggedInUser})
+              } catch(error){
+                  console.error(error)
+              }
+              // Chuyển hướng admin đến trang quản lý
+             // navigation.navigate("HomeageAdmin", { data: "Default" });
+           
+          } else {
+              // Chuyển hướng user thường đến trang chủ
+              //navigation.navigate("HomePage", { data: "Default" });
+              navigation.navigate('Home', { data: loggedInUser });
+            }
       } else {
         Alert.alert('Đăng nhập thất bại', 'Email hoặc mật khẩu không đúng');
       }

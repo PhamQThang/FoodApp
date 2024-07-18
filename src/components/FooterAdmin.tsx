@@ -23,28 +23,28 @@ const FooterAdmin = ({ navigation, data }: { navigation: any; data: string }) =>
 
   return (
     <View style={styles.footer}>
-      <TouchableOpacity
-        style={styles.itemBottom}
-        onPress={() => handleNavigation('HomePageAdmin')}
-      >
-        <Icon name="home" size={30} color={activePage === 'Home' ? '#FF0000' : '#000'} style={styles.iconBottom} />
-        <Text style={[styles.textBottom, activePage === 'Home' && styles.activeText]}>Trang Chủ</Text>
-      </TouchableOpacity>
-      <View style={styles.separator} />
-      <TouchableOpacity
-        style={styles.itemBottom}
-        onPress={() => handleNavigation('Invoice')}
-      >
-        <FontAwesome6Icon name="receipt" size={30} color={activePage === 'Invoice' ? '#FF0000' : '#000'} style={styles.iconBottom} />
-        <Text style={[styles.textBottom, activePage === 'Invoice' && styles.activeText]}>Hóa Đơn</Text>
-      </TouchableOpacity>
       <View style={styles.separator} />
       <TouchableOpacity
         style={styles.itemBottom}
         onPress={() => handleNavigation('ManageProduct')}
       >
-        <FontAwesomeIcon name="user-circle" size={30} color={activePage === 'ManageProduct' ? '#FF0000' : '#000'} style={styles.iconBottom} />
-        <Text style={[styles.textBottom, activePage === 'ManageProduct' && styles.activeText]}>Quản lý</Text>
+        <FontAwesome6Icon name="receipt" size={30} color={activePage === 'ManageProduct' ? '#FF0000' : '#000'} style={styles.iconBottom} />
+        <Text style={[styles.textBottom, activePage === 'ManageProduct' && styles.activeText]}>Sản Phẩm</Text>
+      </TouchableOpacity>
+      <View style={styles.separator} />
+      <TouchableOpacity
+        style={styles.itemBottom}
+        onPress={() => handleNavigation('ChangeInvoice')}
+      >
+        <FontAwesomeIcon name="user-circle" size={30} color={activePage === 'ChangeInvoice' ? '#FF0000' : '#000'} style={styles.iconBottom} />
+        <Text style={[styles.textBottom, activePage === 'ChangeInvoice' && styles.activeText]}>Hóa Đơn</Text>
+      </TouchableOpacity>
+      <View style={styles.separator} />
+      <TouchableOpacity         
+      style={styles.itemBottom}
+      onPress={()=>{navigation.navigate("Login",{data:'default'})}}>
+        <FontAwesomeIcon name="sign-out" size={30} color={activePage === 'Login' ? '#FF0000' : '#000'} style={styles.iconBottom} />
+      <Text style={[styles.textBottom, activePage === 'Login' && styles.activeText]}>Đăng Xuất</Text>
       </TouchableOpacity>
     </View>
   );

@@ -64,9 +64,7 @@ const ChangeInvoice: React.FC<Props> = ({ route, navigation }) => {
       Alert.alert('Error', 'Failed to fetch products');
     }
   };
-  function handleItem(item:any) {
-    navigation.navigate('AddProduct',{data:item})
-  }
+
   async function changeStatus(item:any) {
     try {
         await firestore()
@@ -93,7 +91,7 @@ const ChangeInvoice: React.FC<Props> = ({ route, navigation }) => {
     ])
   }
   const renderOrderItem = ({ item }: { item: { orderdate: string;orderid: string; status: string; totalamount: string; userid: string} }) => (
-    <TouchableOpacity onPress={() => handleItem(item)} onLongPress={()=>deleteItem(item)} style={styles.item}> 
+    <TouchableOpacity onLongPress={()=>deleteItem(item)} style={styles.item}> 
           <View>
           <Text style={styles.foodName}>Status:{item.status}</Text>
           <Text style={styles.foodName}>User ID:{item.userid}</Text>
@@ -115,21 +113,16 @@ const ChangeInvoice: React.FC<Props> = ({ route, navigation }) => {
   useEffect(() => {
     setLoad('0')
     fetchOrders();
+    console.log('====================================');
+    console.log(data);
+    console.log('====================================');
   }, [data,load]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <TouchableOpacity style={styles.background1}>
-        <Text>Hoá Đơn</Text>
+        <Text style={styles.text}>Danh Sách Hoá Đơn</Text>
       </TouchableOpacity>
-      <View style={styles.listButton}>
-        <TouchableOpacity onPress={() => navigation.navigate('ManageProduct',{data:'default'})}>
-          <Text style={[styles.itemButton]}>Sản phẩm</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('ChangeInvoice',{data:'default'})}>
-          <Text style={[styles.itemButton,  styles.activeButton]}>Hoá đơn</Text>
-        </TouchableOpacity>
-      </View>
       <View style={{display:'flex', margin:10}}>
         <FlatList
           data={invoice}
@@ -179,6 +172,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     
   },
+  text:{
+    fontSize: 20,
+    fontWeight: '600'
+  },
   itemButton: {
     fontSize: 16,
     padding: 12,
@@ -191,8 +188,9 @@ const styles = StyleSheet.create({
   },
   background1: {
     backgroundColor: '#fff',
-    paddingTop: 10,
-    
+    paddingTop: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   background: {
 
