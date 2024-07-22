@@ -42,7 +42,7 @@ const Invoice: React.FC<Props> = ({ navigation, route }) => {
                 const orderData = doc.data();
                 const orderDetailsSnapshot = await firestore()
                     .collection('orderDetails')
-                    .where('orderID', '==', doc.id)
+                    .where('orderID', '==', doc.data().orderID)
                     .get();
     
                 const products = [];
@@ -98,15 +98,37 @@ const Invoice: React.FC<Props> = ({ navigation, route }) => {
     }, [orderStatus]);
 
     const handleStatusChange = (status: string) => {
+        setOrderList([])
         setOrderStatus(status);
     };
 
+    const handleCancelInvoice = async (orderID: string) => {
+        try {
+            await firestore()
+                .collection('orders')
+                .doc(orderID)
+                .update({ status: 'Đã Hủy' });
+            
+            Alert.alert('Thành công', 'Đơn hàng đã được hủy');
+            fetchOrders();
+        } catch (error) {
+            console.error('Error updating order status: ', error);
+            Alert.alert('Lỗi', 'Không thể hủy đơn hàng');
+        }
+    };
     const renderOrderItem = ({ item }: { item: any }) => (
         <TouchableOpacity style={styles.orderItem} onPress={() => navigation.navigate('Invoice', { data: data })}>
             <Text style={styles.orderID}>Mã đơn hàng: {item.orderID}</Text>
             <Text style={styles.orderDate}>Ngày đặt hàng: {item.orderDate}</Text>
             <Text style={styles.totalAmount}>Tổng số tiền: {item.totalAmount}đ</Text>
-            <Text style={styles.status}>Trạng thái: {item.status}</Text>
+            <View style={{flexDirection: "row", alignContent: "center", justifyContent: "space-between"}}>
+                <Text style={styles.status}>Trạng thái: {item.status}</Text>
+                {item.status === 'Đã Đặt' && (
+                    <TouchableOpacity style={{backgroundColor: '#FF6347', borderRadius: 10, marginBottom: 10}} onPress={() => handleCancelInvoice(item.orderID)}>
+                        <Text style={[styles.statusButtonCancel]}>Hủy Đơn</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
             <View>
                 <FlatList
                     data={item.products}
@@ -136,6 +158,9 @@ const Invoice: React.FC<Props> = ({ navigation, route }) => {
             <View style={styles.statusContainer}>
                 <TouchableOpacity onPress={() => handleStatusChange('Đã Đặt')}>
                     <Text style={[styles.statusButton, orderStatus === 'Đã Đặt' && styles.activeStatus]}>Đã Đặt</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleStatusChange('Đã Hủy')}>
+                    <Text style={[styles.statusButton, orderStatus === 'Đã Hủy' && styles.activeStatus]}>Đã Hủy</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleStatusChange('Đã Giao')}>
                     <Text style={[styles.statusButton, orderStatus === 'Đã Giao' && styles.activeStatus]}>Đã Giao</Text>
@@ -173,6 +198,13 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 20,
         color: '#333',
+    },
+    statusButtonCancel: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        color: '#fff',
     },
     activeStatus: {
         color: 'red',

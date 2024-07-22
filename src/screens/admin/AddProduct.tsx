@@ -105,6 +105,9 @@ const AddProduct:React.FC<Props>=({route,navigation}) =>{
     }
     
     useEffect( ()=>{
+        console.log('====================================');
+        console.log(data);
+        console.log('====================================');
         //console.log(data.image)
         tangid();
         if(data!='default'){

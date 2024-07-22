@@ -255,7 +255,7 @@ const Cart: React.FC<Props> = ({ navigation, route }) => {
                     }}
                 />
                 <View style={styles.footer}>
-                    <Text style={styles.totalText}>Tổng Số Tiền: ${totalPrice}</Text>
+                    <Text style={styles.totalText}>Tổng Số Tiền: {totalPrice}đ</Text>
                     <TouchableOpacity style={styles.buttonPlaceOrder} onPress={handlePlaceOrder}>
                         <Text style={{ color: 'white', fontWeight: 'bold' }}>Đặt Hàng</Text>
                     </TouchableOpacity>

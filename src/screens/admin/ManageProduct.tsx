@@ -29,7 +29,6 @@ const ManageProduct: React.FC<Props> = ({ route, navigation }) => {
   const { data } = route.params;
   const [status, setStatus] = useState('ManageProduct');
   const [load, setLoad] = useState('');
-  const [HomeAdmin, setHomeAdmin] = useState('<Home');
 
   const fetchFlashSaleItems = async () => {
     try {

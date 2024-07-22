@@ -177,7 +177,7 @@ const Bill: React.FC<Props> = ({ navigation, route }) => {
             />
             {/* Footer với tổng tiền và nút thanh toán */}
             <View style={styles.footer}>
-                <Text style={styles.totalText}>Tổng Số Tiền: ${totalPrice}</Text>
+                <Text style={styles.totalText}>Tổng Số Tiền: {totalPrice}đ</Text>
                 <TouchableOpacity style={styles.buttonPlaceOrder} onPress={handlePayment}>
                     <Text style={{ color: 'white', fontWeight: 'bold' }}>Thanh Toán</Text>
                 </TouchableOpacity>

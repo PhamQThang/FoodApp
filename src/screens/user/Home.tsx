@@ -49,9 +49,6 @@ type Props = {
     useEffect(() => {
         loadFlashSale();
         handleNew();
-        console.log('==============HOME=================');
-        console.log(data);
-        console.log('====================================');
     }, [data]);
 
     const parseDate = (dateString: any) => {

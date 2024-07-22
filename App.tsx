@@ -12,6 +12,7 @@ import Bill from './src/screens/user/Bill';
 import ManageProduct from './src/screens/admin/ManageProduct';
 import AddProduct from './src/screens/admin/AddProduct';
 import ChangeInvoice from './src/screens/admin/ChangeInvoice';
+import ForgotPassword from './src/screens/login/ForgotPassword';
 
 const Stack = createNativeStackNavigator();
 export type RootStackParamList = {
@@ -28,6 +29,7 @@ export type RootStackParamList = {
   ChangeInvoice:{data?:any};
   AddProduct:{data?:any,user?:any};
   ManageProduct:{data?:any};
+  ForgotPassword:{data?:any};
 };
 const App: React.FC = () => {
   return (
@@ -44,6 +46,7 @@ const App: React.FC = () => {
       <Stack.Screen name="ManageProduct" component={ManageProduct} />
       <Stack.Screen name="AddProduct" component={AddProduct}/>
       <Stack.Screen name="ChangeInvoice" component={ChangeInvoice}/>
+      <Stack.Screen name="ForgotPassword" component={ForgotPassword}/>
     </Stack.Navigator>
   </NavigationContainer>
   )

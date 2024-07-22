@@ -27,7 +27,6 @@ const ChangeInvoice: React.FC<Props> = ({ route, navigation }) => {
     { orderdate: string;orderid: string; status: string; totalamount: string; userid: string}[]
   >([]);
   const { data } = route.params;
-  const [status, setStatus] = useState('ChangeInvoice');
   const [load,setLoad] = useState('');
   const fetchOrders = async () => {
     try {
@@ -101,9 +100,11 @@ const ChangeInvoice: React.FC<Props> = ({ route, navigation }) => {
                 <Text style={styles.foodPrice}>Date:{item.orderdate}</Text>
                 <Text style={styles.foodPrice}>Total:{item.totalamount}</Text>
             </View>
-            <TouchableOpacity style={styles.giaobutton} onPress={()=>changeStatus(item)}>
-            <Text style={styles.giaotext}>Đã Giao</Text>
+            {item.status !== 'Đã Giao' && item.status !== 'Đã Hủy' && (
+            <TouchableOpacity style={styles.giaobutton} onPress={() => changeStatus(item)}>
+              <Text style={styles.giaotext}>Đã Giao</Text>
             </TouchableOpacity>
+          )}
         </View>
       </View>
     </TouchableOpacity>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, SafeAreaView, StyleSheet, StatusBar, TextInput, TouchableOpacity, Image, Dimensions, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Fontisto';
 import CheckBox from '@react-native-community/checkbox';
@@ -6,7 +6,9 @@ import { colors } from '../../constaints/colors';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../../App';
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 import Iconeye from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type ScreenANavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 type Props = {
@@ -17,8 +19,26 @@ const Login: React.FC<Props> = ({ navigation }) => {
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [iconName, setIconName] = useState('eye-outline');
+  const [iconName, setIconName] = useState('eye-off-outline');
   const [hidePass, setHidePass] = useState(true);
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const storedEmail = await AsyncStorage.getItem('email');
+        const storedPassword = await AsyncStorage.getItem('password');
+        if (storedEmail && storedPassword) {
+          setEmail(storedEmail);
+          setPassword(storedPassword);
+          setToggleCheckBox(true);
+        }
+      } catch (error) {
+        console.error('Load dữ liệu người dùng lỗi :', error);
+      }
+    };
+
+    loadUserData();
+  }, []);
 
   const handleEmail = (newText: string) => {
     setEmail(newText);
@@ -28,59 +48,44 @@ const Login: React.FC<Props> = ({ navigation }) => {
     setPassword(newText);
   };
 
-  const ischeckicon=()=>{
-    const newicon = iconName === 'eye-outline' ? 'eye-off-outline' : 'eye-outline';
+  const isCheckIcon = () => {
+    const newIcon = iconName === 'eye-outline' ? 'eye-off-outline' : 'eye-outline';
     setHidePass(!hidePass);
-    setIconName(newicon);
-}
+    setIconName(newIcon);
+  };
 
   const handleLogin = async () => {
     try {
-      const snapshot = await firestore().collection('users').get();
-      let loggedInUser = null;
-      let isAdmin = false;
+      await auth().signInWithEmailAndPassword(email, password);
 
-      for (const doc of snapshot.docs) {
-        const emailFB = doc.data().email;
-        const passFB = doc.data().password;
-        const role = doc.data().role; // Lấy thông tin về vai trò của người dùng
-
-        if (emailFB.trim() === email.trim() && passFB.trim() === password.trim()) {
-          loggedInUser = doc.data();
-          console.log('====================================');
-          console.log(loggedInUser.role);
-          console.log('====================================');
-          if (role === 'admin') { // Kiểm tra nếu người dùng là admin
-            isAdmin = true;
-          }
-          break;
+      // Fetch user data from Firestore
+      const userSnapshot = await firestore().collection('users').where('email', '==', email).limit(1).get();
+      if (!userSnapshot.empty) {
+        const userData = userSnapshot.docs[0].data();
+        if (toggleCheckBox) {
+          await AsyncStorage.setItem('email', email);
+          await AsyncStorage.setItem('password', password);
+        } else {
+          await AsyncStorage.removeItem('email');
+          await AsyncStorage.removeItem('password');
         }
 
-
-      }
-
-      if (loggedInUser) {
-          if (isAdmin) {
-              try{  
-                navigation.navigate("ManageProduct",{data: loggedInUser})
-              } catch(error){
-                  console.error(error)
-              }
-              // Chuyển hướng admin đến trang quản lý
-             // navigation.navigate("HomeageAdmin", { data: "Default" });
-           
-          } else {
-              // Chuyển hướng user thường đến trang chủ
-              //navigation.navigate("HomePage", { data: "Default" });
-              navigation.navigate('Home', { data: loggedInUser });
-            }
+        if (userData.role === 'admin') {
+          navigation.navigate("ManageProduct", { data: userData });
+        } else {
+          navigation.navigate('Home', { data: userData });
+        }
       } else {
-        Alert.alert('Đăng nhập thất bại', 'Email hoặc mật khẩu không đúng');
+        Alert.alert('Đăng nhập thất bại', 'Không tìm thấy thông tin người dùng');
       }
     } catch (error) {
-      console.error('Lỗi đăng nhập:', error);
-      Alert.alert('Đăng nhập thất bại', 'Đã xảy ra lỗi khi đăng nhập');
+      let errorMessage = 'Email hoặc mật khẩu không đúng';
+      Alert.alert('Đăng nhập thất bại', errorMessage);
     }
+  };
+
+  const handleForgotPassword = () => {
+    navigation.navigate('ForgotPassword', { data: 'default' });
   };
 
   return (
@@ -107,7 +112,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
             placeholder="Nhập Mật Khẩu"
             style={styles.input}
           />
-          <Iconeye name={iconName} style={styles.iconEye} onPress={ischeckicon} />
+          <Iconeye name={iconName} style={styles.iconEye} onPress={isCheckIcon} />
         </View>
 
         <View style={styles.group1}>
@@ -120,7 +125,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
             />
             <Text style={{ color: colors.text }}>Nhớ Mật Khẩu</Text>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleForgotPassword}>
             <Text style={{ color: colors.red }}>Quên Mật Khẩu</Text>
           </TouchableOpacity>
         </View>

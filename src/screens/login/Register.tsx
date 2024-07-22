@@ -3,6 +3,7 @@ import { View, Text, SafeAreaView, StyleSheet, StatusBar, TextInput, TouchableOp
 import Icon from 'react-native-vector-icons/Fontisto';
 import { StackNavigationProp } from '@react-navigation/stack';
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 import { RootStackParamList } from '../../../App';
 import { colors } from '../../constaints/colors';
 
@@ -25,40 +26,42 @@ const Register: React.FC<Props> = ({ navigation }) => {
 
         try {
             // Kiểm tra xem email đã tồn tại trong Firestore chưa
-             const emailExists = await checkEmailExists(email);
-             if (emailExists) {
-                 Alert.alert('Lỗi', 'Email đã tồn tại');
-                 return;
-             }
-            // Lấy ID hiện tại lớn nhất
-            const snapshot = await firestore().collection('users').orderBy('userID', 'desc').limit(1).get();
-            let newUserID = 1;
-            if (!snapshot.empty) {
-                const lastUser = snapshot.docs[0].data();
-                newUserID = parseInt(lastUser.userID) + 1;
+            const emailExists = await checkEmailExists(email);
+            if (emailExists) {
+                Alert.alert('Lỗi', 'Email đã tồn tại');
+                return;
             }
 
-            // Thêm user mới với userID tự động tăng
-            await firestore().collection('users').doc(newUserID.toString()).set({
-                userID: newUserID.toString(),
+            if (password.length < 6) {
+                Alert.alert('Lỗi', 'Mật khẩu phải có ít nhất 6 ký tự');
+                return;
+            }
+            
+            // Tạo người dùng trên Firebase Authentication
+            const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+
+            // Lấy uid từ Firebase Authentication
+            const uid = userCredential.user.uid;
+
+            // Thêm user mới vào Firestore với uid làm userID
+            await firestore().collection('users').doc(uid).set({
+                userID: uid,
                 email: email,
                 name: name,
-                password: password,
                 role: 'user', // Hoặc 'admin' nếu cần thiết
                 address: '',
                 phone: '',
-                userIMG: ''
             });
 
             // Tạo giỏ hàng cho người dùng mới
-            await firestore().collection('carts').doc(newUserID.toString()).set({
-                cartID: newUserID.toString(),
-                userID: newUserID.toString(),
+            await firestore().collection('carts').doc(uid).set({
+                cartID: uid,
+                userID: uid,
                 date: new Date().toISOString(),
             });
 
             Alert.alert('Thành công', 'Đăng ký thành công');
-            navigation.navigate('Login', {data: 'default'});
+            navigation.navigate('Login', { data: 'default' });
         } catch (error) {
             console.error('Error registering user: ', error);
             Alert.alert('Lỗi', 'Không thể đăng ký');
@@ -72,7 +75,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar backgroundColor={colors.bgColor} barStyle={'dark-content'} />
-            <Image source={require('../../../src/assets/images/footer.png')} style={styles.logo}/>
+            <Image source={require('../../../src/assets/images/footer.png')} style={styles.logo} />
             <View style={styles.title}>
                 <Text style={{ fontWeight: 'bold', fontSize: 30, color: 'black' }}>Đăng Ký</Text>
             </View>
