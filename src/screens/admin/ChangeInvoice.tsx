@@ -64,18 +64,57 @@ const ChangeInvoice: React.FC<Props> = ({ route, navigation }) => {
     }
   };
 
-  async function changeStatus(item:any) {
+
+  async function changeStatus(item: any) {
     try {
-        await firestore()
-          .collection('orders')
-          .doc(item.orderid)
-          .update({ status: 'Đã Giao' });
-        setLoad('1'); // Trích xuất và hiển thị lại danh sách sản phẩm
-      } catch (error) {
-        console.error('Lỗi khi cập nhật trạng thái đơn hàng:', error);
-        // Xử lý lỗi tại đây, ví dụ hiển thị thông báo lỗi cho người dùng
+      // Truy vấn và cập nhật đơn hàng dựa trên orderID
+      const ordersSnapshot = await firestore()
+        .collection('orders')
+        .where('orderID', '==', item.orderid)
+        .get();
+
+      const batch = firestore().batch();
+
+      ordersSnapshot.forEach(doc => {
+        batch.update(doc.ref, { status: 'Đã Giao' });
+      });
+
+      await batch.commit();
+
+      // Lấy chi tiết đơn hàng
+      const orderDetailsSnapshot = await firestore()
+        .collection('orderDetails')
+        .where('orderID', '==', item.orderid)
+        .get();
+
+      for (const detailDoc of orderDetailsSnapshot.docs) {
+        const detailData = detailDoc.data();
+
+        // Lấy sản phẩm từ collection products dựa trên productID
+        const productSnapshot = await firestore()
+          .collection('products')
+          .where('productID', '==', detailData.productID)
+          .get();
+
+        productSnapshot.forEach(async productDoc => {
+          const productData = productDoc.data();
+          const newSellNumber = parseInt(productData?.sellNumber || 0) + parseInt(detailData.quantity);
+
+          // Cập nhật sellNumber của sản phẩm
+          await firestore()
+            .collection('products')
+            .doc(productDoc.id)
+            .update({ sellNumber: newSellNumber });
+        });
       }
+
+      setLoad('1'); // Trích xuất và hiển thị lại danh sách sản phẩm
+    } catch (error) {
+      console.error('Lỗi khi cập nhật trạng thái đơn hàng:', error);
+      Alert.alert('Error', 'Failed to update order status');
+    }
   }
+  
   function deleteItem(item:any){
     Alert.alert('Bạn muốn xoá ko', '', [
       {
@@ -114,9 +153,6 @@ const ChangeInvoice: React.FC<Props> = ({ route, navigation }) => {
   useEffect(() => {
     setLoad('0')
     fetchOrders();
-    console.log('====================================');
-    console.log(data);
-    console.log('====================================');
   }, [data,load]);
 
   return (
@@ -229,6 +265,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: 'white',
+    paddingBottom: 100
   },
 });
 
