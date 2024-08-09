@@ -73,6 +73,9 @@ const Login: React.FC<Props> = ({ navigation }) => {
         if (userData.role === 'admin') {
           navigation.navigate("ManageProduct", { data: userData });
         } else {
+          console.log('====================================');
+          console.log(userData);
+          console.log('====================================');
           navigation.navigate('Home', { data: userData });
         }
       } else {
@@ -157,7 +160,7 @@ const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 30,
+    paddingTop: 60,
   },
   logo: {
     marginTop: 60,

@@ -24,7 +24,7 @@ export type RootStackParamList = {
   Invoice : { userID?: any, orderID?: any};
   Cart: { data?: any };
   Bill: { data?: any, selectedProducts?: any, totalPrice ?: any };
-  ProductDetail: { data?: any, userID?: any };
+  ProductDetail: { data?: any, userID?: any,userName?: any };
   HomeAdmin:{data?:any};
   ChangeInvoice:{data?:any};
   AddProduct:{data?:any,user?:any};

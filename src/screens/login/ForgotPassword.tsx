@@ -54,6 +54,14 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
       <TouchableOpacity onPress={handleForgotPassword} style={styles.btn}>
         <Text style={{ color: colors.white }}>Gửi email reset mật khẩu</Text>
       </TouchableOpacity>
+      <View style={styles.group3}>
+          <Text style={{ color: colors.text }}>Bạn đã có tài khoản ? </Text>
+          <View>
+            <TouchableOpacity onPress={() => navigation.navigate('Login', { data: 'default' })}>
+              <Text style={{ color: colors.red }}>Đăng Nhập</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
     </View>
 
     <Image resizeMode="stretch" style={styles.img} source={require('../../../src/assets/images/images.png')} />
@@ -65,7 +73,7 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 100,
+        paddingTop: 130,
       },
       logo: {
         marginTop: 60,
@@ -101,6 +109,11 @@ const styles = StyleSheet.create({
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
+      },
+      group3: {
+        marginTop: 10,
+        flexDirection: 'row',
+        justifyContent: 'center',
       },
 
 });

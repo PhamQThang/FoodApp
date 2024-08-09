@@ -47,6 +47,9 @@ type Props = {
     const [colorEvaluate, setColorEvaluate] = useState('black');
 
     useEffect(() => {
+      console.log('====================================');
+      console.log(data.name);
+      console.log('====================================');
         loadFlashSale();
         handleNew();
     }, [data]);
@@ -174,7 +177,7 @@ type Props = {
     };
 
     function handleItem(item: any) {
-        navigation.navigate('ProductDetail', { data: item, userID: data.userID });
+        navigation.navigate('ProductDetail', { data: item, userID: data.userID, userName: data.name });
     }
 
     const renderFlashSaleItem = ({ item }: { item: FlashSaleItem }) => (
